@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Spotify Top Items and Saved Track Extractor</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Hey there Rockstar! 🎸</h1>
+    <p>This is a simple Flask web application developed for the purpose of retrieving
+       some key information about your <span style="color:#1DB954;font-weight:bold">Spotify</span> usage which you may be interested!
+    </p>
+    
+    
+    {% if authenticated %}
+      <!-- Content to display when the user is authenticated -->
+      <div class="alert alert-success" role="alert">
+        Authentication succeeded! You are authenticated, click on the buttons below to retrieve your data!
+      </div>
+      <!-- Buttons for retrieving data -->
+      <div class="d-flex flex-row">
+        <a href="/retrieve/saved-tracks" class="btn btn-primary flex-fill mr-1">Retrieve Saved Tracks</a>
+        <a href="/retrieve/top-artists" class="btn btn-primary flex-fill mr-1">Retrieve Top Artists</a>
+        <a href="/retrieve/top-tracks" class="btn btn-primary flex-fill mr-1">Retrieve Top Tracks</a>
+      </div>
+      <!-- Additional authenticated user content can go here -->
+    {% else %}
+    
+      <!-- Content to display when the user is not authenticated -->
+    <p>Before we begin, ensure that you've follow the instructions below:</p>
+    <ol type='1'>
+    <li>First, you would need a Spotify Developer developer application which you can sign create with your spotify account <a href='https://developer.spotify.com/dashboard' target="_blank">here</a></li>
+    <ul>
+      <li>Make sure you provide the correct <b>Redirect URI</b>. It should be the same link in which your Flask App will be hosted on, e.g. <b>http://localhost:5000</b></li>
+    </ul>
+    <li>Second, you would need to create a config.py file which will be used to store the <b>Client ID</b>, <b>Client Secret</b>, <b>Redirect URI</b> for accessing the Spotify API to retrieve data.</li>
+    </ol>
+    <br>
+    <p> Once you are done, you can proceed to authenticate with the button below:</p>
+    <a href="/authenticate" class="btn btn-primary">Authenticate</a>
+    {% endif %}
+
+    {% if session.get('top_tracks') or session.get('top_artists') or session.get('saved_tracks')%}
+      <a href="/clearScreen">Clear Screen</a>
+    {% endif %}
+    <!-- Top 10 Tracks -->
+    {% if session.get('top_tracks') %}
+      <h2>Top 10 Tracks:</h2>
+      <ol>
+        {% for track in session['top_tracks'] %}
+          <li>
+            {{ track[0] }} - <a href="{{ track[2]}}" target="_blank">{{ track[1] }}</a> (Popularity: {{ track[3] }})
+            <br>
+            Release Date: {{ track[5] }}
+            <br>
+            <img src="{{ track[6] }}" alt="Album Image">
+            <br>
+            <a href="{{ track[7] }}" target="_blank">Album Link</a>
+            <br>
+            Preview: <a href="{{ track[8] }}" target="_blank">Listen</a>
+          </li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+
+    <!-- Top 10 Artists -->
+    {% if session.get('top_artists') %}
+    <h2>Top 10 Artists:</h2>
+    <ol>
+      {% for artist in session['top_artists'] %}
+        <li>
+          {{ artist[0] }} (Popularity: {{ artist[1] }})
+          <br>
+          Genres: {{ artist[3] | join(', ') }}
+          <br>
+          <img src="{{ artist[4] }}" alt="Artist Image">
+          <br>
+          <a href="{{ artist[2] }}" target="_blank">Artist Link</a>
+        </li>
+      {% endfor %}
+    </ol>
+    {% endif %}
+
+    <!-- Latest Saved -->
+    {% if session.get('saved_tracks') %}
+      <h2>Last 10 Saved Tracks:</h2>
+      <ol>
+        {% for track in session['saved_tracks'] %}
+          <li>
+            {{ track[0] }} - {{ track[2] }} (Popularity: {{ track[3] }})
+            <br>
+            Album: {{ track[1] }}
+            <br>
+            Added At: {{ track[4] }}
+            <br>
+            <img src="{{ track[6] }}" alt="Track Image">
+            <br>
+            <a href="{{ track[5] }}" target="_blank">Track Link</a>
+            <br>
+            Preview: <a href="{{ track[7] }}" target="_blank">Listen</a>
+          </li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+    
+  </div>
+</body>
+</html>
